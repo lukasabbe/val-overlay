@@ -1,0 +1,11 @@
+node_modules
+build
+.output
+.svelte-kit
+.env
+.env.*
+!.env.example
+Dockerfile
+.dockerignore
+.gitignore
+*.log
