@@ -70,7 +70,7 @@
 
 				if (data) {
 					votesText.text = `Räknade röster: ${data.valomrade.totaltAntalRoster.toLocaleString('sv-SE')}`;
-					updateText.text = `Senaste uppdaterad: ${new Date(data.senasteUppdateringstid).toLocaleTimeString('sv-SE')}`;
+					updateText.text = `Senast uppdaterad: ${new Date(data.senasteUppdateringstid).toLocaleTimeString('sv-SE')}`;
 					testText.text = data.test ? "ALL DATA ÄR TESTER AV VALMYNDIGHETEN!" : "";
 
 					const chartData: ChartData[] = [];
