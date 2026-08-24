@@ -49,7 +49,13 @@
 			updateText.x = app.screen.width - 20;
 			updateText.y = 20;
 
-			app.stage.addChild(votesText, updateText);
+			// Top middle
+			const testText = new Text({ text: '', style: textStyle });
+			testText.anchor.set(0.5, 0);
+			testText.x = app.screen.width/2;
+			testText.y = 20;
+
+			app.stage.addChild(votesText, updateText, testText);
 
 			let chart: BarChart | null = null;
 
@@ -65,6 +71,7 @@
 				if (data) {
 					votesText.text = `Räknade röster: ${data.valomrade.totaltAntalRoster.toLocaleString('sv-SE')}`;
 					updateText.text = `Senaste uppdaterad: ${new Date(data.senasteUppdateringstid).toLocaleTimeString('sv-SE')}`;
+					testText.text = data.test ? "ALL DATA ÄR TESTER AV VALMYNDIGHETEN!" : "";
 
 					const chartData: ChartData[] = [];
 					const backgroundData: ChartData[] = [];
