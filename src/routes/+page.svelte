@@ -45,9 +45,14 @@
 				data: { family: 'Hard Compound' }
 			});
 
+			await Assets.load({
+				src: 'fonts/BebasNeue.ttf',
+				data: { family: 'Bebas Neue' }
+			});
+
 			const textStyle = new TextStyle({
-				fontFamily: 'Hard Compound',
-				fontSize: 28,
+				fontFamily: 'Bebas Neue',
+				fontSize: 30,
 				fill: 0xffffff,
 				fontWeight: 'bold',
 				stroke: { color: 0x000000, width: 6, join: 'round' }

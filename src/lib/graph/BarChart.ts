@@ -59,7 +59,7 @@ export class BarChart extends Container {
 
   private setUpChart(data: ChartData[]) {
     const textStyle = new TextStyle({
-      fontFamily: "Hard Compound",
+      fontFamily: "Bebas Neue",
       fontSize: 32,
       fill: 0xffffff,
       fontWeight: "bold",
