@@ -68,9 +68,10 @@ export class MandatBar extends Container {
     this.rightFill.x = 0;
     this.rightFill.scale.x = 0;
 
-    // Reference line at half maxValue (a thin tick, not a gap)
+    // Clear reference line at half maxValue (full bar height with black outline)
     const middleX = width / 2;
-    this.middleLine.moveTo(middleX, 0).lineTo(middleX, height * 0.15).stroke({ color: 0xffffff, width: 2 });
+    this.middleLine.moveTo(middleX, -5).lineTo(middleX, height + 5).stroke({ color: 0x000000, width: 4, join: "round" });
+    this.middleLine.moveTo(middleX, -3).lineTo(middleX, height + 3).stroke({ color: 0xffffff, width: 2, join: "round" });
 
     // Middle text below the bar
     this.middleText.text = `${maxValue / 2}`;
