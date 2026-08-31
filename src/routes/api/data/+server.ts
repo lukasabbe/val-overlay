@@ -14,8 +14,6 @@ async function refresh(): Promise<void> {
 // Initial load
 let refreshing = refresh();
 
-// Background refresh on a fixed cadence - user requests never trigger
-// upstream calls themselves, they only read the cached result
 setInterval(() => {
 	refreshing = refresh();
 }, REFRESH_INTERVAL).unref();

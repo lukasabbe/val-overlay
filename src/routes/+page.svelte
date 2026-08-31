@@ -3,10 +3,26 @@
 	import { Application, Assets, Text, TextStyle } from 'pixi.js';
 	import type { Root } from '$lib/types/mandatfordelning';
 	import { BarChart, type ChartData } from '$lib/graph/BarChart';
+    import { Bar } from '$lib/graph/Bar';
+    import { Diamond } from '$lib/graph/Diamond';
+    import { MandatBar } from '$lib/graph/MandatBar';
+    import { PARTY_DATA } from '$lib/PartyData';
+    import { page } from '$app/state';
 
 	let canvasHost: HTMLDivElement;
 	let data: Root | null = null;
 
+
+	let leftMandatGroup = $derived(
+		page.url.searchParams.get('left')
+			? page.url.searchParams.get('left')!.split(',')
+			: PARTY_DATA.DEFAULT_MANDAT_GROUPS.left
+	);
+	let rightMandatGroup = $derived(
+		page.url.searchParams.get('right')
+			? page.url.searchParams.get('right')!.split(',')
+			: PARTY_DATA.DEFAULT_MANDAT_GROUPS.right
+	);
 
 	onMount(() => {
 		let interval: ReturnType<typeof setInterval>;
@@ -40,8 +56,8 @@
 			// Top left corner
 			const votesText = new Text({ text: '', style: textStyle });
 			votesText.anchor.set(0, 0);
-			votesText.x = 20;
-			votesText.y = 20;
+			votesText.x = 100;
+			votesText.y = app.screen.height - 250;
 
 			// Top right corner
 			const updateText = new Text({ text: '', style: textStyle });
@@ -58,6 +74,9 @@
 			app.stage.addChild(votesText, updateText, testText);
 
 			let chart: BarChart | null = null;
+			let bar: Bar | null = null;
+			let diamond: Diamond | null = null;
+			let mandatBar: MandatBar | null = null;
 
 			const fetchData = async () => {
 				console.log('Fetching data...');
@@ -69,18 +88,24 @@
 				console.log('Data fetched:', data);
 
 				if (data) {
-					votesText.text = `Räknade röster: ${data.valomrade.totaltAntalRoster.toLocaleString('sv-SE')}`;
+					votesText.text = `Räknade röster: ${data.valomrade.totaltAntalRoster.toLocaleString('sv-SE')}\nRäknade Valdistrikt:\n${data.valomrade.antalValdistriktRaknade} av ${data.valomrade.antalValdistriktSomSkaRaknas}`;
 					updateText.text = `Senast uppdaterad: ${new Date(data.senasteUppdateringstid).toLocaleTimeString('sv-SE')}`;
 					testText.text = data.test ? "ALL DATA ÄR TESTER AV VALMYNDIGHETEN!" : "";
+					diamond = new Diamond("Test", 200, 150, textStyle);
+					diamond.y = app.screen.height - 300;
+					diamond.x = 450;
+					app.stage.addChild(diamond);
 
 					const chartData: ChartData[] = [];
 					const backgroundData: ChartData[] = [];
+
+					data.valomrade.rostfordelning.rosterPaverkaMandat.partiRoster.sort((a, b) => PARTY_DATA.partier.get(a.partikod)!.order - PARTY_DATA.partier.get(b.partikod)!.order);
 
 					for (const party of data.valomrade.rostfordelning.rosterPaverkaMandat.partiRoster) {
 						chartData.push({
 							label: party.partiforkortning,
 							value: party.andelRoster,
-							color: Number(`0x${party.fargkod.substring(1)}`)
+							color: Number(`0x${PARTY_DATA.partier.get(party.partikod)?.color.substring(1)}`)
 						});
 						backgroundData.push({
 							value: party.andelRosterForegaendeVal || 0,
@@ -88,8 +113,6 @@
 						});
 
 					}
-					chartData.reverse();
-					backgroundData.reverse();
 
 					chartData.push({
 						label: 'Övriga',
@@ -103,17 +126,50 @@
 						color: 0x000000 // Black color for background
 					});
 
+					let valDistrictsCounted = data.valomrade.antalValdistriktRaknade;
+					let valDistrictsTotal = data.valomrade.antalValdistriktSomSkaRaknas;
+
+					const mandatfordelning = data.valomrade.mandatfordelning?.partiLista ?? [];
+					const mandatByParty = new Map(mandatfordelning.map((p) => [p.partikod, p.antalMandat]));
+					const sumMandat = (ids: string[]) =>
+						ids.reduce((sum, id) => sum + (mandatByParty.get(id) ?? 0), 0);
+
+					const totalMandat = data.valomrade.totaltAntalMandat;
+					const leftValue = sumMandat(leftMandatGroup);
+					const rightValue = sumMandat(rightMandatGroup);
+
 					if (!chart) {
-						// First fetch - create the chart
 						chart = new BarChart(chartData, backgroundData);
-						const totalWidth = chartData.length * (140 + 60) - 60;
-						chart.x = (app.screen.width - totalWidth) / 2;
-						chart.y = app.screen.height - 60; // 60px margin for labels below the baseline
+						const totalWidth = chartData.length * (90 + 50) - 50;
+						chart.x = (app.screen.width - totalWidth - 30);
+						chart.y = app.screen.height - 245; // 60px margin for labels below the baseline
 						app.stage.addChild(chart);
+
+						bar = new Bar({ width: 40, height: 900, maxValue: valDistrictsTotal}, { value: valDistrictsCounted, color: 0xFF0000 });
+						bar.x = 50;
+						bar.y = app.screen.height - 1050;
+						app.stage.addChild(bar);
+
+						mandatBar = new MandatBar({
+							height: 50,
+							width: 1090,
+							maxValue: totalMandat,
+							leftValue: leftValue,
+							leftColor: 0xff0000,
+							leftLabel: leftMandatGroup.map((id) => PARTY_DATA.partier.get(id)?.shortName).join('+'),
+							rightValue: rightValue,
+							rightColor: 0x52BDEC,
+							rightLabel: rightMandatGroup.map((id) => PARTY_DATA.partier.get(id)?.shortName).join('+'),
+							textStyle: textStyle
+						});
+						mandatBar.x = 680;
+						mandatBar.y = app.screen.height - 200;
+						app.stage.addChild(mandatBar);
 					} else {
-						// Later fetches - just update the values so they animate
 						chart.updateChart(chartData.map((d) => d.value));
 						chart.updateBackgroundChart(backgroundData.map((d) => d.value));
+						if (bar) bar.update({ value: valDistrictsCounted, color: 0xFF0000 });
+						if (mandatBar) mandatBar.update({ leftValue: leftValue, rightValue: rightValue });
 					}
 				}
 			};

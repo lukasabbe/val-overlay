@@ -16,9 +16,9 @@ export class BarChart extends Container {
   private backgroundValues: number[] = [];
   private backgroundTargetValues: number[] = [];
 
-  private maxChartHeight = 600;
-  private barWidth = 140;
-  private spacing = 60;
+  private maxChartHeight = 250;
+  private barWidth = 90;
+  private spacing = 50;
   private maxValue = 100;
 
   constructor(data: ChartData[], backgroundData?: ChartData[]) {
@@ -88,7 +88,7 @@ export class BarChart extends Container {
       const titleText = new Text({ text: item.label ?? "", style: textStyle });
       titleText.anchor.set(0.5, 0);
       titleText.x = xPos + this.barWidth / 2;
-      titleText.y = 15;
+      titleText.y = 5;
       this.titles.push(titleText);
       this.addChild(titleText);
 
