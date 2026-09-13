@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { DataHandler } from '$lib/data';
 
 const REFRESH_INTERVAL = 1000 * 60 * 5;
-const dataHandler = new DataHandler(true);
+const dataHandler = new DataHandler(false);
 
 async function refresh(): Promise<void> {
 	return dataHandler.fetchData().catch((err) => {

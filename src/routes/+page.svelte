@@ -96,7 +96,7 @@
 					votesText.text = `Räknade röster: ${data.valomrade.totaltAntalRoster.toLocaleString('sv-SE')}\nRäknade Valdistrikt:\n${data.valomrade.antalValdistriktRaknade} av ${data.valomrade.antalValdistriktSomSkaRaknas}`;
 					updateText.text = `Senast uppdaterad: ${new Date(data.senasteUppdateringstid).toLocaleTimeString('sv-SE')}`;
 					testText.text = data.test ? "ALL DATA ÄR TESTER AV VALMYNDIGHETEN!" : "";
-					diamond = new Diamond("Test", 200, 150, textStyle);
+					diamond = new Diamond("Sverige", 200, 150, textStyle);
 					diamond.y = app.screen.height - 300;
 					diamond.x = 450;
 					app.stage.addChild(diamond);
