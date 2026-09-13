@@ -131,11 +131,22 @@
 					let valDistrictsTotal = data.valomrade.antalValdistriktSomSkaRaknas;
 
 					const mandatfordelning = data.valomrade.mandatfordelning?.partiLista ?? [];
-					const mandatByParty = new Map(mandatfordelning.map((p) => [p.partikod, p.antalMandat]));
+					const totalMandat = data.valomrade.totaltAntalMandat;
+
+					// Fall back to estimating mandates from vote shares while the
+					// official mandate distribution isn't published yet.
+					let mandatByParty = new Map(mandatfordelning.map((p) => [p.partikod, p.antalMandat]));
+					if (mandatByParty.size === 0) {
+						const estimMandat = new Map<string, number>();
+						for (const party of data.valomrade.rostfordelning.rosterPaverkaMandat.partiRoster) {
+							estimMandat.set(party.partikod, Math.round((party.andelRoster / 100) * totalMandat));
+						}
+						mandatByParty = estimMandat;
+					}
+
 					const sumMandat = (ids: string[]) =>
 						ids.reduce((sum, id) => sum + (mandatByParty.get(id) ?? 0), 0);
 
-					const totalMandat = data.valomrade.totaltAntalMandat;
 					const leftValue = sumMandat(leftMandatGroup);
 					const rightValue = sumMandat(rightMandatGroup);
 
