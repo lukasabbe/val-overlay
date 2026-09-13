@@ -187,7 +187,7 @@
 			};
 
 			await fetchData();
-			interval = setInterval(fetchData, 1000 * 60 * 5); // Fetch data every 5 minutes
+			interval = setInterval(fetchData, 1000 * 60); // Fetch data every 1 minutes
 		})();
 
 		return () => clearInterval(interval);

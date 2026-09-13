@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { DataHandler } from '$lib/data';
 
-const REFRESH_INTERVAL = 1000 * 60 * 5;
+const REFRESH_INTERVAL = 1000 * 60;
 const dataHandler = new DataHandler(false);
 
 async function refresh(): Promise<void> {
